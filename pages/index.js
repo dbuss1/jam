@@ -1,37 +1,55 @@
-import React from "react";
-import Head from "next/head";
-import Nav from "../components/nav";
-import Waveform from "../components/waveform";
+import React, { useRef, useState } from 'react';
+import Head from 'next/head';
+import Nav from '../components/nav';
+import Waveform from '../components/waveform';
 
-const Home = () => (
-  <div>
-    <Head>
-      <title>Home</title>
-      <link rel="icon" href="/favicon.ico" />
-    </Head>
+const TRACKS = [
+  {
+    title: 'SAS',
+    url: '/track1.mp3',
+    waveformUrl: 'https://wave.sndcdn.com/GjqmL0Sprea3_m.json'
+  }
+];
 
-    <Nav />
+const App = () => {
+  const [currentTrack, setCurrentTrack] = useState(TRACKS[0]);
+  const audioRef = useRef(null);
 
-    <header>
-      <h1>🌶️ 🐅</h1>
-    </header>
+  return (
+    <div>
+      <Head>
+        <title>🌶️ 🐅</title>
+        {/* <link rel="icon" href="/favicon.ico" /> */}
+      </Head>
 
-    <section>
-      <Waveform url="https://wave.sndcdn.com/GjqmL0Sprea3_m.json" />
-    </section>
+      <Nav />
 
-    <style jsx>{`
-      :global(body) {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, Avenir Next, Avenir,
-          Helvetica, sans-serif;
-      }
-      header > h1 {
-        text-align: center;
-        font-size: 48px;
-      }
-    `}</style>
-  </div>
-);
+      <header>
+        <h1>🌶️ 🐅</h1>
+      </header>
 
-export default Home;
+      <section>
+        <h2>{currentTrack.title}</h2>
+        <Waveform audioRef={audioRef} track={currentTrack} />
+      </section>
+
+      <audio ref={audioRef} />
+
+      <style jsx>{`
+        :global(body) {
+          margin: 0;
+          font-family: -apple-system, BlinkMacSystemFont, Avenir Next, Avenir, Helvetica, sans-serif;
+        }
+        header > h1 {
+          text-align: center;
+          font-size: 48px;
+        }
+        section {
+          text-align: center;
+        }
+      `}</style>
+    </div>
+  );
+};
+
+export default App;
