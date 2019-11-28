@@ -1,22 +1,15 @@
-import React from 'react'
-import Link from 'next/link'
+import React from 'react';
 
 const links = [
-  { href: 'https://zeit.co/now', label: 'ZEIT' },
-  { href: 'https://github.com/zeit/next.js', label: 'GitHub' },
+  { href: '/', label: 'Home' },
 ].map(link => {
   link.key = `nav-link-${link.href}-${link.label}`
   return link
-})
+});
 
 const Nav = () => (
   <nav>
     <ul>
-      <li>
-        <Link href="/">
-          <a>Home</a>
-        </Link>
-      </li>
       {links.map(({ key, href, label }) => (
         <li key={key}>
           <a href={href}>{label}</a>
@@ -25,24 +18,23 @@ const Nav = () => (
     </ul>
 
     <style jsx>{`
-      :global(body) {
-        margin: 0;
-        font-family: -apple-system, BlinkMacSystemFont, Avenir Next, Avenir,
-          Helvetica, sans-serif;
-      }
       nav {
-        text-align: center;
-      }
-      ul {
-        display: flex;
-        justify-content: space-between;
+        position: sticky;
+        position: -webkit-sticky;
+        top: 0;
+        background: white;
+        border-bottom: 1px solid #ddd;
       }
       nav > ul {
-        padding: 4px 16px;
+        display: flex;
+        margin: 0;
+        padding: 0 16px;
+      }
+      ul, li {
+        list-style-type: none;
       }
       li {
-        display: flex;
-        padding: 6px 8px;
+        padding: 24px 16px;
       }
       a {
         color: #067df7;
@@ -51,6 +43,6 @@ const Nav = () => (
       }
     `}</style>
   </nav>
-)
+);
 
-export default Nav
+export default Nav;
