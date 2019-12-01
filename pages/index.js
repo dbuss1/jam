@@ -1,19 +1,13 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import Head from 'next/head';
+import Audio from '../components/audio';
 import Nav from '../components/nav';
 import Waveform from '../components/waveform';
-
-const TRACKS = [
-  {
-    title: 'SAS',
-    url: '/track1.mp3',
-    waveformUrl: 'https://wave.sndcdn.com/GjqmL0Sprea3_m.json'
-  }
-];
+import { PLAYER_STATUSES, TRACKS } from '../constants';
 
 const App = () => {
-  const [currentTrack, setCurrentTrack] = useState(TRACKS[0]);
-  const audioRef = useRef(null);
+  const [currentTrack, setCurrentTrack] = useState({});
+  const [playerStatus, setPlayerStatus] = useState(PLAYER_STATUSES.STOPPED);
 
   return (
     <div>
@@ -29,11 +23,36 @@ const App = () => {
       </header>
 
       <section>
-        <h2>{currentTrack.title}</h2>
-        <Waveform audioRef={audioRef} track={currentTrack} />
+        {TRACKS.map((track, i) => (
+          <div
+            className="track-wrapper"
+            onClick={() => {
+              setPlayerStatus(PLAYER_STATUSES.PLAYING);
+              setCurrentTrack(track);
+            }}
+            key={`track-wrapper-${i}`}
+          >
+            <p>{track.title}</p>
+            <Waveform waveformUrl={track.waveformUrl} />
+          </div>
+        ))}
       </section>
 
-      <audio ref={audioRef} />
+      <div>{/* TODO: move to component */}
+        {playerStatus === PLAYER_STATUSES.PAUSED && (
+          <button onClick={() => setPlayerStatus(PLAYER_STATUSES.PLAYING)}>Play</button>
+        )}
+        {playerStatus === PLAYER_STATUSES.PLAYING && (
+          <button onClick={() => setPlayerStatus(PLAYER_STATUSES.PAUSED)}>Pause</button>
+        )}
+        {playerStatus === PLAYER_STATUSES.PLAYING || playerStatus === PLAYER_STATUSES.PAUSED ? (
+          <button onClick={() => setPlayerStatus(PLAYER_STATUSES.STOPPED)}>Stop</button>
+        ) : (
+          null
+        )}
+      </div>
+
+      <Audio trackUrl={currentTrack.url} status={playerStatus} />
 
       <style jsx>{`
         :global(body) {
@@ -46,6 +65,10 @@ const App = () => {
         }
         section {
           text-align: center;
+        }
+        .track-wrapper {
+          border: 1px dashed grey;
+          margin: 8px 0;
         }
       `}</style>
     </div>

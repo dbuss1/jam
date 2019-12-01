@@ -17,18 +17,18 @@ function getColor(
   return (barIndex / numBars < percentPlayed / 100) ? COLORS.played : COLORS.unplayed;
 }
 
-const Waveform = ({ track, height = 100, width = 1080 }) => {
+const Waveform = ({ waveformUrl, height = 100, width = 1080 }) => {
   const [waveformData, setWaveformData] = useState({});
-  const [percentPlayed, setPercentPlayed] = useState(0);
+  const [percentPlayed, setPercentPlayed] = useState(50);
 
   useEffect(() => {
     async function fetchWaveformData() {
-      const resp = await fetch(track.waveformUrl);
+      const resp = await fetch(waveformUrl);
       const json = await resp.json();
       setWaveformData(json);
     }
     fetchWaveformData();
-  }, [track]);
+  }, [waveformUrl]);
 
   if (!waveformData.samples || waveformData.samples.length === 0) {
     return null;
@@ -84,11 +84,7 @@ const Waveform = ({ track, height = 100, width = 1080 }) => {
 };
 
 Waveform.propTypes = {
-  track: PropTypes.shape({
-    title: PropTypes.string,
-    url: PropTypes.string,
-    waveformUrl: PropTypes.string,
-  }),
+  waveformUrl: PropTypes.string,
   height: PropTypes.number,
   width: PropTypes.number
 };
