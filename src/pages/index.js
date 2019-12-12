@@ -32,13 +32,14 @@ const App = () => {
             }}
             key={`track-wrapper-${i}`}
           >
-            <p>{track.title}</p>
-            <Waveform waveformUrl={track.waveformUrl} />
+            <h3 className="track-title">{track.title}</h3>
+            <Waveform trackUrl={track.url} />
           </div>
         ))}
       </section>
 
-      <div>{/* TODO: move to component */}
+      <div>
+        {/* TODO: move to component */}
         {playerStatus === PLAYER_STATUSES.PAUSED && (
           <button onClick={() => setPlayerStatus(PLAYER_STATUSES.PLAYING)}>Play</button>
         )}
@@ -47,15 +48,15 @@ const App = () => {
         )}
         {playerStatus === PLAYER_STATUSES.PLAYING || playerStatus === PLAYER_STATUSES.PAUSED ? (
           <button onClick={() => setPlayerStatus(PLAYER_STATUSES.STOPPED)}>Stop</button>
-        ) : (
-          null
-        )}
+        ) : null}
       </div>
 
       <Audio trackUrl={currentTrack.url} status={playerStatus} />
 
       <style jsx>{`
         :global(body) {
+          background: #282831;
+          color: white;
           margin: 0;
           font-family: -apple-system, BlinkMacSystemFont, Avenir Next, Avenir, Helvetica, sans-serif;
         }
@@ -67,8 +68,13 @@ const App = () => {
           text-align: center;
         }
         .track-wrapper {
-          border: 1px dashed grey;
-          margin: 8px 0;
+          margin: 0 16px 32px;
+          overflow: hidden;
+        }
+        .track-title {
+          font-weight: normal;
+          text-align: left;
+          margin: 1rem 0;
         }
       `}</style>
     </div>

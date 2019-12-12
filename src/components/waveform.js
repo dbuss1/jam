@@ -1,82 +1,40 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { chunk } from 'lodash';
 import { mean } from 'd3-array';
-import { scaleLinear } from 'd3-scale';
 
-const COLORS = {
-  played: '#ff9000',
-  unplayed: '#aaa',
-};
+const LINE_COLOR = 'white';
+const NUM_LINES = 400;
+const CANVAS_HEIGHT = '120px';
 
-function getColor(
-  numBars,
-  barIndex,
-  percentPlayed
-) {
-  return (barIndex / numBars < percentPlayed / 100) ? COLORS.played : COLORS.unplayed;
-}
-
-const Waveform = ({ waveformUrl, height = 100, width = 1080 }) => {
-  const [waveformData, setWaveformData] = useState({});
-  const [percentPlayed, setPercentPlayed] = useState(50);
+const Waveform = ({ trackUrl }) => {
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    async function fetchWaveformData() {
-      const resp = await fetch(waveformUrl);
-      const json = await resp.json();
-      setWaveformData(json);
-    }
-    fetchWaveformData();
-  }, [waveformUrl]);
-
-  if (!waveformData.samples || waveformData.samples.length === 0) {
-    return null;
-  }
-
-  const scaleLinearHeight = scaleLinear()
-    .domain([0, waveformData.height])
-    .range([0, height]);
-
-  const numChunks = width / 3; // 3px per chunk (2px width + 1px marginRight)
-  const chunks = chunk(
-    waveformData.samples,
-    waveformData.width / numChunks
-  );
-
-  // TODO: use canvas instead?
+    const fetchTrackUrl = async () => {
+      const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      const response = await fetch(trackUrl);
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+      const filteredData = normalizeData(filterAudioData(audioBuffer));
+      draw(canvasRef.current, filteredData);
+    };
+    fetchTrackUrl();
+  }, [canvasRef]);
 
   return (
     <div className="waveform-container">
-      <div className="waveform">
-        {chunks.map((chunk, i) => (
-          <span
-            key={`waveform-chunk-${i}`}
-            onClick={() => {
-            // TODO
-            }}
-          >
-            <span
-              style={{
-                backgroundColor: getColor(
-                  chunks.length,
-                  i,
-                  percentPlayed,
-                ),
-                display: 'inline-block',
-                width: 2,
-                marginRight: 1,
-                height: scaleLinearHeight(mean(chunk))
-              }}
-            />
-          </span>
-        ))}
-      </div>
+      <canvas ref={canvasRef} />
       <style jsx>{`
-        .waveform-container, .waveform {
+        .waveform-container {
           display: flex;
           align-items: center;
           justify-content: center;
+        }
+        canvas {
+          width: 100%;
+          height: ${CANVAS_HEIGHT};
+          margin: 0 auto;
         }
       `}</style>
     </div>
@@ -84,9 +42,46 @@ const Waveform = ({ waveformUrl, height = 100, width = 1080 }) => {
 };
 
 Waveform.propTypes = {
-  waveformUrl: PropTypes.string,
-  height: PropTypes.number,
-  width: PropTypes.number
+  trackUrl: PropTypes.string
 };
 
 export default Waveform;
+
+function filterAudioData(audioBuffer) {
+  const rawData = audioBuffer.getChannelData(0);
+  const dataPointsPerLine = Math.floor(rawData.length / NUM_LINES);
+  return chunk(
+    rawData.map(d => Math.abs(d)),
+    dataPointsPerLine
+  ).map(c => mean(c));
+}
+
+function normalizeData(data) {
+  const multiplier = Math.pow(Math.max(...data), -1);
+  return data.map(n => n * multiplier);
+}
+
+function draw(canvas, normalizedData) {
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = canvas.offsetWidth * dpr;
+  canvas.height = canvas.offsetHeight * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.translate(0, canvas.offsetHeight / 2);
+
+  const width = canvas.offsetWidth / normalizedData.length;
+  for (let i = 0; i < normalizedData.length; i++) {
+    const x = width * i;
+    let height = normalizedData[i] * canvas.offsetHeight;
+    drawLine(ctx, x, height);
+  }
+}
+
+function drawLine(ctx, x, height) {
+  ctx.lineWidth = 1;
+  ctx.strokeStyle = LINE_COLOR;
+  ctx.beginPath();
+  ctx.moveTo(x, -(height / 2));
+  ctx.lineTo(x, height / 2);
+  ctx.stroke();
+}

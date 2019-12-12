@@ -6,13 +6,11 @@ export const PLAYER_STATUSES = {
 
 export const TRACKS = [
   {
-    title: 'Foo',
+    title: 'Smooth',
     url: '/track1.mp3',
-    waveformUrl: 'https://wave.sndcdn.com/GjqmL0Sprea3_m.json'
   },
   {
-    title: 'Hitch Hike',
+    title: 'A Journey With Good Intentions',
     url: '/track2.mp3',
-    waveformUrl: 'https://wave.sndcdn.com/syE9mDy5LUzq_m.json'
   }
 ];

@@ -9,10 +9,13 @@
   },
   "dependencies": {
     "d3-array": "^2.4.0",
-    "d3-scale": "^3.2.1",
     "lodash": "^4.17.15",
     "next": "9.1.4",
     "react": "16.12.0",
     "react-dom": "16.12.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.7.2",
+    "eslint-plugin-react": "^7.17.0"
   }
 }
