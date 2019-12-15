@@ -1,26 +1,56 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { chunk } from 'lodash';
 import { mean } from 'd3-array';
 
-const LINE_COLOR = 'white';
-const NUM_LINES = 400;
-const CANVAS_HEIGHT = '120px';
+const DEFAULT_COLOR = 'white';
+const DEFAULT_HEIGHT = 120;
+const MAX_NUM_LINES = 1000;
 
-const Waveform = ({ trackUrl }) => {
+const Waveform = ({ trackUrl, color = DEFAULT_COLOR, height = DEFAULT_HEIGHT }) => {
   const canvasRef = useRef(null);
+  const [canvasWidth, setCanvasWidth] = useState();
+  const [audioData, setAudioData] = useState();
 
+  // Fetch track and set audio data on state
   useEffect(() => {
-    const fetchTrackUrl = async () => {
+    const getAudioDataFromTrack = async () => {
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
       const response = await fetch(trackUrl);
       const arrayBuffer = await response.arrayBuffer();
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-      const filteredData = normalizeData(filterAudioData(audioBuffer));
-      draw(canvasRef.current, filteredData);
+      const rawData = audioBuffer.getChannelData(0);
+      // rawData is massive. Instead of storing it all in state, reduce it to
+      // the max supported granularity so re-draws perform much faster.
+      const reducedRawData = filterAudioData(rawData, MAX_NUM_LINES);
+      setAudioData(reducedRawData);
     };
-    fetchTrackUrl();
+    getAudioDataFromTrack();
+  }, []);
+
+  // Set canvas width and resize listener
+  useEffect(() => {
+    if (canvasRef) {
+      setCanvasWidth(canvasRef.current.offsetWidth);
+      const handleResize = () => {
+        setCanvasWidth(canvasRef.current.offsetWidth);
+      };
+      window.addEventListener('resize', handleResize);
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      }
+    }
   }, [canvasRef]);
+
+  // Draw waveform
+  useEffect(() => {
+    if (audioData && canvasRef && canvasWidth) {
+      const filteredData = normalizeData(
+        filterAudioData(audioData, getNumLines(canvasWidth))
+      );
+      draw(canvasRef.current, filteredData, color);
+    }
+  }, [audioData, canvasRef, canvasWidth]);
 
   return (
     <div className="waveform-container">
@@ -33,7 +63,7 @@ const Waveform = ({ trackUrl }) => {
         }
         canvas {
           width: 100%;
-          height: ${CANVAS_HEIGHT};
+          height: ${height}px;
           margin: 0 auto;
         }
       `}</style>
@@ -42,18 +72,26 @@ const Waveform = ({ trackUrl }) => {
 };
 
 Waveform.propTypes = {
-  trackUrl: PropTypes.string
+  trackUrl: PropTypes.string.isRequired,
+  color: PropTypes.string,
+  height: PropTypes.number
 };
 
 export default Waveform;
 
-function filterAudioData(audioBuffer) {
-  const rawData = audioBuffer.getChannelData(0);
-  const dataPointsPerLine = Math.floor(rawData.length / NUM_LINES);
+// Chunks audio data based on number of waveform lines
+// and maps that into the mean of each chunk.
+function filterAudioData(audioData, numLines) {
+  const dataPointsPerLine = Math.floor(audioData.length / numLines);
   return chunk(
-    rawData.map(d => Math.abs(d)),
+    audioData.map(d => Math.abs(d)),
     dataPointsPerLine
   ).map(c => mean(c));
+}
+
+// Determine number of lines to render based on canvas width
+function getNumLines(canvasWidth) {
+  return Math.min(MAX_NUM_LINES, canvasWidth / 5); // one line every 5px
 }
 
 function normalizeData(data) {
@@ -61,7 +99,7 @@ function normalizeData(data) {
   return data.map(n => n * multiplier);
 }
 
-function draw(canvas, normalizedData) {
+function draw(canvas, normalizedData, color) {
   const dpr = window.devicePixelRatio || 1;
   canvas.width = canvas.offsetWidth * dpr;
   canvas.height = canvas.offsetHeight * dpr;
@@ -72,14 +110,14 @@ function draw(canvas, normalizedData) {
   const width = canvas.offsetWidth / normalizedData.length;
   for (let i = 0; i < normalizedData.length; i++) {
     const x = width * i;
-    let height = normalizedData[i] * canvas.offsetHeight;
-    drawLine(ctx, x, height);
+    const height = normalizedData[i] * canvas.offsetHeight;
+    drawLine(ctx, x, height, color);
   }
 }
 
-function drawLine(ctx, x, height) {
+function drawLine(ctx, x, height, color) {
   ctx.lineWidth = 1;
-  ctx.strokeStyle = LINE_COLOR;
+  ctx.strokeStyle = color;
   ctx.beginPath();
   ctx.moveTo(x, -(height / 2));
   ctx.lineTo(x, height / 2);
