@@ -1,15 +1,27 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import { PLAYER_STATUSES } from '../constants';
+import PlayerContext from '../playerContext';
 
 const Audio = ({ trackUrl, status }) => {
-  const audioRef = useRef(null);
+  const audioRef = useRef({});
+  const { setElapsed, setDuration } = useContext(PlayerContext);
+
+  useEffect(() => {
+    audioRef.current.addEventListener('timeupdate', ({ target }) => {
+      setElapsed(target.currentTime);
+      setDuration(target.duration);
+    });
+    return () => {
+      audioRef.current.removeEventListener('timeupdate', () => {});
+    };
+  }, [audioRef]);
 
   useEffect(() => {
     if (trackUrl && audioRef.current.src !== trackUrl) {
       audioRef.current.src = trackUrl;
     }
-  }, [trackUrl]);
+  }, [audioRef, trackUrl]);
 
   useEffect(() => {
     console.log('audio effect! status:', status);
@@ -22,7 +34,7 @@ const Audio = ({ trackUrl, status }) => {
     } else if (status === PLAYER_STATUSES.PLAYING && audioRef.current.paused) {
       audioRef.current.play();
     }
-  }, [status]);
+  }, [audioRef, status]);
 
   return <audio ref={audioRef} />;
 };
