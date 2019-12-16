@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { chunk } from 'lodash';
 import { mean } from 'd3-array';
+import Loading from './loading';
 
 const DEFAULT_COLOR = 'white';
 const DEFAULT_HEIGHT = 120;
@@ -9,8 +10,9 @@ const MAX_NUM_LINES = 1000;
 
 const Waveform = ({ trackUrl, color = DEFAULT_COLOR, height = DEFAULT_HEIGHT }) => {
   const canvasRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [canvasWidth, setCanvasWidth] = useState();
-  const [audioData, setAudioData] = useState();
+  const [audioData, setAudioData] = useState([]);
 
   // Fetch track and set audio data on state
   useEffect(() => {
@@ -24,6 +26,7 @@ const Waveform = ({ trackUrl, color = DEFAULT_COLOR, height = DEFAULT_HEIGHT }) 
       // the max supported granularity so re-draws perform much faster.
       const reducedRawData = filterAudioData(rawData, MAX_NUM_LINES);
       setAudioData(reducedRawData);
+      setIsLoading(false);
     };
     getAudioDataFromTrack();
   }, []);
@@ -38,33 +41,38 @@ const Waveform = ({ trackUrl, color = DEFAULT_COLOR, height = DEFAULT_HEIGHT }) 
       window.addEventListener('resize', handleResize);
       return () => {
         window.removeEventListener('resize', handleResize);
-      }
+      };
     }
   }, [canvasRef]);
 
   // Draw waveform
   useEffect(() => {
-    if (audioData && canvasRef && canvasWidth) {
-      const filteredData = normalizeData(
-        filterAudioData(audioData, getNumLines(canvasWidth))
-      );
+    if (audioData.length > 0 && canvasRef && canvasWidth) {
+      const filteredData = normalizeData(filterAudioData(audioData, getNumLines(canvasWidth)));
       draw(canvasRef.current, filteredData, color);
     }
   }, [audioData, canvasRef, canvasWidth]);
 
   return (
     <div className="waveform-container">
+      {isLoading && <Loading />}
       <canvas ref={canvasRef} />
       <style jsx>{`
         .waveform-container {
           display: flex;
           align-items: center;
           justify-content: center;
+          height: ${height}px;
+          padding: 4px 8px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 4px;
+          cursor: pointer;
         }
         canvas {
           width: 100%;
-          height: ${height}px;
+          height: 100%;
           margin: 0 auto;
+          position: ${isLoading ? 'absolute' : 'relative'};
         }
       `}</style>
     </div>

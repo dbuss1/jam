@@ -64,14 +64,13 @@ const App = () => {
           text-align: center;
           font-size: 48px;
         }
-        section {
-          text-align: center;
-        }
         .track-wrapper {
           margin: 0 16px 32px;
           overflow: hidden;
         }
         .track-title {
+          display: inline-block;
+          cursor: pointer;
           font-weight: normal;
           text-align: left;
           margin: 1rem 0;
