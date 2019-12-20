@@ -3,14 +3,27 @@ import PropTypes from 'prop-types';
 import { PLAYER_STATUSES } from '../constants';
 import PlayerContext from '../playerContext';
 
-const Audio = ({ trackUrl, status }) => {
+const Audio = () => {
   const audioRef = useRef({});
-  const { setElapsed, setDuration } = useContext(PlayerContext);
+  const { trackUrl, status, elapsed, setElapsed, duration, setDuration } = useContext(
+    PlayerContext
+  );
+
+  const setAudioSrc = trackUrl => {
+    audioRef.current.src = trackUrl;
+    if (status === PLAYER_STATUSES.PLAYING) {
+      audioRef.current.play();
+    }
+  };
 
   useEffect(() => {
     audioRef.current.addEventListener('timeupdate', ({ target }) => {
-      setElapsed(target.currentTime);
-      setDuration(target.duration);
+      if (elapsed !== target.elapsed) {
+        setElapsed(target.currentTime);
+      }
+      if (duration !== target.duration) {
+        setDuration(target.duration);
+      }
     });
     return () => {
       audioRef.current.removeEventListener('timeupdate', () => {});
@@ -18,13 +31,19 @@ const Audio = ({ trackUrl, status }) => {
   }, [audioRef]);
 
   useEffect(() => {
-    if (trackUrl && audioRef.current.src !== trackUrl) {
-      audioRef.current.src = trackUrl;
+    if (audioRef.current && audioRef.current.src) {
+      const currentAudioSrc = new URL(audioRef.current.src);
+      if (trackUrl && currentAudioSrc.pathname !== trackUrl) {
+        setAudioSrc(trackUrl);
+      }
+    } else {
+      if (trackUrl) {
+        setAudioSrc(trackUrl);
+      }
     }
-  }, [audioRef, trackUrl]);
+  }, [audioRef, status, trackUrl]);
 
   useEffect(() => {
-    console.log('audio effect! status:', status);
     if (status === PLAYER_STATUSES.PAUSED) {
       audioRef.current.pause();
     } else if (status === PLAYER_STATUSES.STOPPED) {

@@ -52,7 +52,7 @@ const App = () => {
               key={`track-wrapper-${i}`}
             >
               <h3 className="track-title">{title}</h3>
-              <Waveform trackUrl={url} />
+              <Waveform waveformTrackUrl={url} />
             </div>
           ))}
         </section>
@@ -70,7 +70,7 @@ const App = () => {
           ) : null}
         </div>
 
-        <Audio trackUrl={trackUrl} status={status} />
+        <Audio />
 
         <style jsx>{`
           :global(body) {
