@@ -4,6 +4,7 @@ import { chunk } from 'lodash';
 import { mean } from 'd3-array';
 import Loading from './loading';
 import PlayerContext from '../playerContext';
+import { PLAYER_STATUSES } from '../constants';
 
 const DEFAULT_COLORS = {
   unplayed: 'white',
@@ -16,10 +17,16 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
   const canvasRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRendered, setIsRendered] = useState(false);
-  const [canvasWidth, setCanvasWidth] = useState();
   const [audioData, setAudioData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
-  const { trackUrl: playerTrackUrl, elapsed, duration } = useContext(PlayerContext);
+  const {
+    trackUrl: playerTrackUrl,
+    setStatus,
+    elapsed,
+    duration,
+    setSeekingTo,
+    changeSong
+  } = useContext(PlayerContext);
 
   // Fetch track and set audio data on state
   useEffect(() => {
@@ -38,38 +45,26 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
     getAudioDataFromTrack();
   }, []);
 
-  // Set canvas width and resize listener
-  useEffect(() => {
-    if (canvasRef) {
-      setCanvasWidth(canvasRef.current.offsetWidth);
-      const handleResize = () => {
-        setCanvasWidth(canvasRef.current.offsetWidth);
-      };
-      window.addEventListener('resize', handleResize);
-      return () => {
-        window.removeEventListener('resize', handleResize);
-      };
-    }
-  }, [canvasRef]);
-
   // Set filtered data based on number of lines we can draw
   useEffect(() => {
-    if (audioData.length > 0 && canvasWidth) {
-      setFilteredData(normalizeData(filterAudioData(audioData, getNumLines(canvasWidth))));
+    if (audioData.length > 0 && canvasRef) {
+      setFilteredData(
+        normalizeData(filterAudioData(audioData, getNumLines(canvasRef.current.offsetWidth)))
+      );
     }
-  }, [audioData, canvasWidth]);
+  }, [audioData, canvasRef]);
 
   // Draw/redraw waveform
   useEffect(() => {
-    const isPlaying = playerTrackUrl === waveformTrackUrl;
+    const isActive = playerTrackUrl === waveformTrackUrl;
 
     // Don't redraw waveforms that aren't playing.
-    if (isRendered && !isPlaying) return;
+    if (isRendered && !isActive) return;
 
     if (canvasRef && filteredData.length > 0) {
       setIsRendered(true);
       draw({
-        isPlaying,
+        isActive,
         canvas: canvasRef.current,
         normalizedData: filteredData,
         percentPlayed: elapsed / duration,
@@ -78,8 +73,23 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
     }
   }, [canvasRef, filteredData, elapsed, duration]);
 
+  const handleWaveformClick = e => {
+    const isActive = playerTrackUrl === waveformTrackUrl;
+
+    if (isActive) {
+      let clickedPercent = (e.clientX - canvasRef.current.offsetLeft) / canvasRef.current.offsetWidth;
+      clickedPercent = Math.max(0, clickedPercent);
+      clickedPercent = Math.min(1, clickedPercent);
+
+      setSeekingTo(clickedPercent * duration);
+      setStatus(PLAYER_STATUSES.PLAYING);
+    } else {
+      changeSong(waveformTrackUrl);
+    }
+  };
+
   return (
-    <div className="waveform-container">
+    <div className="waveform-container" onClick={handleWaveformClick}>
       {isLoading && <Loading />}
       <canvas ref={canvasRef} />
       <style jsx>{`
@@ -88,7 +98,7 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
           align-items: center;
           justify-content: center;
           height: ${height}px;
-          padding: 4px 8px;
+          padding: 1rem;
           background-image: linear-gradient(transparent, rgba(255, 255, 255, 0.1), transparent);
           border-radius: 4px;
           cursor: pointer;
@@ -135,7 +145,7 @@ function normalizeData(data) {
   return data.map(n => n * multiplier);
 }
 
-function draw({ isPlaying, canvas, normalizedData, percentPlayed, colors }) {
+function draw({ isActive, canvas, normalizedData, percentPlayed, colors }) {
   const dpr = window.devicePixelRatio || 1;
   canvas.width = canvas.offsetWidth * dpr;
   canvas.height = canvas.offsetHeight * dpr;
@@ -149,9 +159,7 @@ function draw({ isPlaying, canvas, normalizedData, percentPlayed, colors }) {
     const x = width * i;
     const height = normalizedData[i] * canvas.offsetHeight;
     ctx.strokeStyle =
-      isPlaying && percentPlayed && percentPlayed > i / normalizedData.length
-        ? colors.played
-        : colors.unplayed;
+      isActive && percentPlayed > i / normalizedData.length ? colors.played : colors.unplayed;
     ctx.beginPath();
     ctx.moveTo(x, -(height / 2));
     ctx.lineTo(x, height / 2);

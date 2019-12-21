@@ -5,43 +5,39 @@ import PlayerContext from '../playerContext';
 
 const Audio = () => {
   const audioRef = useRef({});
-  const { trackUrl, status, elapsed, setElapsed, duration, setDuration } = useContext(
-    PlayerContext
-  );
+  const {
+    trackUrl,
+    status,
+    elapsed,
+    setElapsed,
+    duration,
+    setDuration,
+    seekingTo,
+    setSeekingTo
+  } = useContext(PlayerContext);
 
-  const setAudioSrc = trackUrl => {
-    audioRef.current.src = trackUrl;
-    if (status === PLAYER_STATUSES.PLAYING) {
-      audioRef.current.play();
-    }
-  };
+  //////////////////
+  // debugging
+  useEffect(() => {
+    console.log('status change!', status);
+  }, [status])
 
   useEffect(() => {
-    audioRef.current.addEventListener('timeupdate', ({ target }) => {
-      if (elapsed !== target.elapsed) {
-        setElapsed(target.currentTime);
-      }
-      if (duration !== target.duration) {
-        setDuration(target.duration);
-      }
-    });
-    return () => {
-      audioRef.current.removeEventListener('timeupdate', () => {});
-    };
-  }, [audioRef]);
+    console.log('trackUrl change!', trackUrl);
+  }, [trackUrl])
 
   useEffect(() => {
-    if (audioRef.current && audioRef.current.src) {
-      const currentAudioSrc = new URL(audioRef.current.src);
-      if (trackUrl && currentAudioSrc.pathname !== trackUrl) {
-        setAudioSrc(trackUrl);
-      }
-    } else {
-      if (trackUrl) {
-        setAudioSrc(trackUrl);
-      }
-    }
-  }, [audioRef, status, trackUrl]);
+    console.log('elapsed change!', elapsed);
+  }, [elapsed])
+
+  useEffect(() => {
+    console.log('duration change!', duration);
+  }, [duration])
+
+  useEffect(() => {
+    console.log('seekingTo change!', seekingTo);
+  }, [seekingTo])
+  //////////////////
 
   useEffect(() => {
     if (status === PLAYER_STATUSES.PAUSED) {
@@ -49,13 +45,29 @@ const Audio = () => {
     } else if (status === PLAYER_STATUSES.STOPPED) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
-      // this.setState({ selectedTrack: null });
-    } else if (status === PLAYER_STATUSES.PLAYING && audioRef.current.paused) {
+    } else if (status === PLAYER_STATUSES.PLAYING) {
       audioRef.current.play();
     }
-  }, [audioRef, status]);
+  }, [audioRef, status, trackUrl]);
 
-  return <audio ref={audioRef} />;
+  useEffect(() => {
+    if (audioRef && Number.isFinite(seekingTo)) {
+      audioRef.current.currentTime = seekingTo;
+      setElapsed(seekingTo);
+      setSeekingTo(undefined);
+    }
+  }, [audioRef, seekingTo]);
+
+  const handleTimeUpdate = ({ target }) => {
+    if (elapsed !== target.elapsed) {
+      setElapsed(target.currentTime);
+    }
+    if (target.duration && duration !== target.duration) {
+      setDuration(target.duration);
+    }
+  };
+
+  return <audio ref={audioRef} src={trackUrl} onTimeUpdate={handleTimeUpdate} />;
 };
 
 Audio.propTypes = {

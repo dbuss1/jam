@@ -8,24 +8,30 @@ import PlayerContext from '../playerContext';
 
 const App = () => {
   const [status, setStatus] = useState(PLAYER_STATUSES.STOPPED);
-  const [title, setTitle] = useState();
   const [trackUrl, setTrackUrl] = useState();
   const [elapsed, setElapsed] = useState(0);
   const [duration, setDuration] = useState();
+  const [seekingTo, setSeekingTo] = useState();
+
+  const changeSong = newTrackUrl => {
+    setStatus(PLAYER_STATUSES.PLAYING);
+    setTrackUrl(newTrackUrl);
+  };
 
   return (
     <PlayerContext.Provider
       value={{
         status,
         setStatus,
-        title,
-        setTitle,
         trackUrl,
         setTrackUrl,
         elapsed,
         setElapsed,
         duration,
-        setDuration
+        setDuration,
+        seekingTo,
+        setSeekingTo,
+        changeSong
       }}
     >
       <div>
@@ -42,16 +48,10 @@ const App = () => {
 
         <section>
           {TRACKS.map(({ title, url }, i) => (
-            <div
-              className="track-wrapper"
-              onClick={() => {
-                setStatus(PLAYER_STATUSES.PLAYING);
-                setTitle(title);
-                setTrackUrl(url);
-              }}
-              key={`track-wrapper-${i}`}
-            >
-              <h3 className="track-title">{title}</h3>
+            <div className="track-wrapper" key={`track-wrapper-${i}`}>
+              <h3 className="track-title" onClick={() => changeSong(url)}>
+                {title}
+              </h3>
               <Waveform waveformTrackUrl={url} />
             </div>
           ))}
@@ -85,7 +85,7 @@ const App = () => {
             font-size: 48px;
           }
           .track-wrapper {
-            margin: 0 16px 32px;
+            margin-bottom: 32px;
             overflow: hidden;
           }
           .track-title {
@@ -93,7 +93,7 @@ const App = () => {
             cursor: pointer;
             font-weight: normal;
             text-align: left;
-            margin: 1rem 0;
+            margin: 1rem;
           }
         `}</style>
       </div>
