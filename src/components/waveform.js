@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { chunk } from 'lodash';
 import { mean } from 'd3-array';
 import Loading from './loading';
+import TimeString from './timestring';
 import PlayerContext from '../playerContext';
 import { PLAYER_STATUSES } from '../constants';
 
@@ -29,6 +30,8 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
     setSeekingTo,
     changeTrack
   } = useContext(PlayerContext);
+
+  const isActive = playerTrackUrl === waveformTrackUrl;
 
   // Fetch track and set audio data on state
   useEffect(() => {
@@ -86,8 +89,6 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
 
   // Redraw active waveform as it plays to update `played` line colors
   useEffect(() => {
-    const isActive = playerTrackUrl === waveformTrackUrl;
-
     if (isActive && isRendered) {
       draw({
         isActive,
@@ -114,8 +115,6 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
   }, [playerTrackUrl]);
 
   const handleWaveformClick = e => {
-    const isActive = playerTrackUrl === waveformTrackUrl;
-
     if (isActive) {
       let clickedPercent =
         (e.clientX - canvasRef.current.offsetLeft) / canvasRef.current.offsetWidth;
@@ -133,22 +132,20 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
     <div className="waveform-container" onClick={handleWaveformClick}>
       {isLoading && <Loading />}
       <canvas ref={canvasRef} />
+      {isActive && <TimeString elapsed={elapsed} duration={duration} />}
       <style jsx>{`
         .waveform-container {
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          position: relative;
+          vertical-align: middle;
+          text-align: center;
           height: ${height}px;
           padding: 1rem;
           background-image: linear-gradient(transparent, rgba(255, 255, 255, 0.1), transparent);
-          border-radius: 4px;
           cursor: pointer;
         }
         canvas {
           width: 100%;
           height: 100%;
-          margin: 0 auto;
-          position: ${isLoading ? 'absolute' : 'relative'};
         }
       `}</style>
     </div>

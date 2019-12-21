@@ -46,7 +46,7 @@ const App = () => {
         setDuration,
         seekingTo,
         setSeekingTo,
-        changeTrack,
+        changeTrack
       }}
     >
       <div>

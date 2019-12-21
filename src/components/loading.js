@@ -8,6 +8,12 @@ const Loading = ({ size = 30 }) => {
       <style jsx>{`
         div {
           display: inline-block;
+          margin: auto;
+          position: absolute;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          right: 0;
           border: ${size / 6}px solid white;
           border-top: ${size / 6}px solid orange;
           border-radius: 50%;
@@ -30,7 +36,7 @@ const Loading = ({ size = 30 }) => {
 };
 
 Loading.propTypes = {
-  size: PropTypes.number,
+  size: PropTypes.number
 };
 
 export default Loading;
