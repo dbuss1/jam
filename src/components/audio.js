@@ -21,23 +21,23 @@ const Audio = () => {
   // debugging
   useEffect(() => {
     console.log('status change!', status);
-  }, [status])
+  }, [status]);
 
   useEffect(() => {
     console.log('trackUrl change!', trackUrl);
-  }, [trackUrl])
+  }, [trackUrl]);
 
   useEffect(() => {
     console.log('elapsed change!', elapsed);
-  }, [elapsed])
+  }, [elapsed]);
 
   useEffect(() => {
     console.log('duration change!', duration);
-  }, [duration])
+  }, [duration]);
 
   useEffect(() => {
     console.log('seekingTo change!', seekingTo);
-  }, [seekingTo])
+  }, [seekingTo]);
   //////////////////
 
   useEffect(() => {
@@ -59,16 +59,26 @@ const Audio = () => {
     }
   }, [audioRef, seekingTo]);
 
-  const handleTimeUpdate = ({ target }) => {
-    if (elapsed !== target.elapsed) {
-      setElapsed(target.currentTime);
-    }
+  const handleLoadedMetadata = ({ target }) => {
     if (target.duration && duration !== target.duration) {
       setDuration(target.duration);
     }
   };
 
-  return <audio ref={audioRef} src={trackUrl} onTimeUpdate={handleTimeUpdate} />;
+  const handleTimeUpdate = ({ target }) => {
+    if (elapsed !== target.elapsed) {
+      setElapsed(target.currentTime);
+    }
+  };
+
+  return (
+    <audio
+      ref={audioRef}
+      src={trackUrl}
+      onLoadedMetadata={handleLoadedMetadata}
+      onTimeUpdate={handleTimeUpdate}
+    />
+  );
 };
 
 Audio.propTypes = {
