@@ -13,7 +13,8 @@ const Audio = () => {
     duration,
     setDuration,
     seekingTo,
-    setSeekingTo
+    setSeekingTo,
+    changeTrack
   } = useContext(PlayerContext);
 
   //////////////////
@@ -44,7 +45,7 @@ const Audio = () => {
       audioRef.current.pause();
     } else if (status === PLAYER_STATUSES.STOPPED) {
       audioRef.current.pause();
-      audioRef.current.currentTime = 0;
+      changeTrack();
     } else if (status === PLAYER_STATUSES.PLAYING) {
       audioRef.current.play();
     }

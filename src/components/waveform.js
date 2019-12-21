@@ -19,13 +19,15 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
   const [isRendered, setIsRendered] = useState(false);
   const [audioData, setAudioData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
+  const [canvasWidth, setCanvasWidth] = useState([]);
   const {
     trackUrl: playerTrackUrl,
+    previousTrackUrl,
     setStatus,
     elapsed,
     duration,
     setSeekingTo,
-    changeSong
+    changeTrack
   } = useContext(PlayerContext);
 
   // Fetch track and set audio data on state
@@ -45,6 +47,20 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
     getAudioDataFromTrack();
   }, []);
 
+  // Set canvas resize listener
+  useEffect(() => {
+    if (canvasRef) {
+      setCanvasWidth(canvasRef.current.offsetWidth);
+      const handleResize = () => {
+        setCanvasWidth(canvasRef.current.offsetWidth);
+      };
+      window.addEventListener('resize', handleResize);
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }
+  }, [canvasRef]);
+
   // Set filtered data based on number of lines we can draw
   useEffect(() => {
     if (audioData.length > 0 && canvasRef) {
@@ -52,17 +68,27 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
         normalizeData(filterAudioData(audioData, getNumLines(canvasRef.current.offsetWidth)))
       );
     }
-  }, [audioData, canvasRef]);
+  }, [audioData, canvasRef, canvasWidth]);
 
-  // Draw/redraw waveform
+  // Draw waveforms - initial draw or redraw on resize (filteredData changes)
+  useEffect(() => {
+    if (canvasRef && filteredData.length > 0) {
+      if (!isRendered) setIsRendered(true);
+      draw({
+        isActive: playerTrackUrl === waveformTrackUrl,
+        canvas: canvasRef.current,
+        normalizedData: filteredData,
+        percentPlayed: elapsed / duration,
+        colors
+      });
+    }
+  }, [canvasRef, filteredData]);
+
+  // Redraw active waveform as it plays to update `played` line colors
   useEffect(() => {
     const isActive = playerTrackUrl === waveformTrackUrl;
 
-    // Don't redraw waveforms that aren't playing.
-    if (isRendered && !isActive) return;
-
-    if (canvasRef && filteredData.length > 0) {
-      setIsRendered(true);
+    if (isActive && isRendered) {
       draw({
         isActive,
         canvas: canvasRef.current,
@@ -71,20 +97,35 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
         colors
       });
     }
-  }, [canvasRef, filteredData, elapsed, duration]);
+  }, [elapsed]);
+
+  // When playerTrackUrl is changed, redraw the previously active Waveform to remove the `played`
+  // line colors.
+  useEffect(() => {
+    if (previousTrackUrl === waveformTrackUrl) {
+      draw({
+        isActive: false,
+        canvas: canvasRef.current,
+        normalizedData: filteredData,
+        percentPlayed: elapsed / duration,
+        colors
+      });
+    }
+  }, [playerTrackUrl]);
 
   const handleWaveformClick = e => {
     const isActive = playerTrackUrl === waveformTrackUrl;
 
     if (isActive) {
-      let clickedPercent = (e.clientX - canvasRef.current.offsetLeft) / canvasRef.current.offsetWidth;
+      let clickedPercent =
+        (e.clientX - canvasRef.current.offsetLeft) / canvasRef.current.offsetWidth;
       clickedPercent = Math.max(0, clickedPercent);
       clickedPercent = Math.min(1, clickedPercent);
 
       setSeekingTo(clickedPercent * duration);
       setStatus(PLAYER_STATUSES.PLAYING);
     } else {
-      changeSong(waveformTrackUrl);
+      changeTrack(waveformTrackUrl);
     }
   };
 

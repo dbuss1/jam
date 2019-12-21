@@ -9,13 +9,27 @@ import PlayerContext from '../playerContext';
 const App = () => {
   const [status, setStatus] = useState(PLAYER_STATUSES.STOPPED);
   const [trackUrl, setTrackUrl] = useState();
+  const [previousTrackUrl, setPreviousTrackUrl] = useState();
   const [elapsed, setElapsed] = useState(0);
   const [duration, setDuration] = useState();
   const [seekingTo, setSeekingTo] = useState();
 
-  const changeSong = newTrackUrl => {
-    setStatus(PLAYER_STATUSES.PLAYING);
-    setTrackUrl(newTrackUrl);
+  const stopTrack = () => {
+    setTrackUrl();
+    setStatus(PLAYER_STATUSES.STOPPED);
+    setDuration();
+    setElapsed(0);
+  };
+
+  const changeTrack = newTrackUrl => {
+    setPreviousTrackUrl(trackUrl);
+    if (newTrackUrl) {
+      setElapsed(0);
+      setTrackUrl(newTrackUrl);
+      setStatus(PLAYER_STATUSES.PLAYING);
+    } else {
+      stopTrack();
+    }
   };
 
   return (
@@ -25,13 +39,14 @@ const App = () => {
         setStatus,
         trackUrl,
         setTrackUrl,
+        previousTrackUrl,
         elapsed,
         setElapsed,
         duration,
         setDuration,
         seekingTo,
         setSeekingTo,
-        changeSong
+        changeTrack,
       }}
     >
       <div>
@@ -49,7 +64,7 @@ const App = () => {
         <section>
           {TRACKS.map(({ title, url }, i) => (
             <div className="track-wrapper" key={`track-wrapper-${i}`}>
-              <h3 className="track-title" onClick={() => changeSong(url)}>
+              <h3 className="track-title" onClick={() => changeTrack(url)}>
                 {title}
               </h3>
               <Waveform waveformTrackUrl={url} />
