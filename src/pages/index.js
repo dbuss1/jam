@@ -3,6 +3,7 @@ import Head from 'next/head';
 import Audio from '../components/audio';
 import Nav from '../components/nav';
 import Waveform from '../components/waveform';
+import CurrentlyPlaying from '../components/currentlyPlaying';
 import { PLAYER_STATUSES, TRACKS } from '../constants';
 import PlayerContext from '../playerContext';
 
@@ -72,18 +73,7 @@ const App = () => {
           ))}
         </section>
 
-        <div>
-          {/* TODO: move to component */}
-          {status === PLAYER_STATUSES.PAUSED && (
-            <button onClick={() => setStatus(PLAYER_STATUSES.PLAYING)}>Play</button>
-          )}
-          {status === PLAYER_STATUSES.PLAYING && (
-            <button onClick={() => setStatus(PLAYER_STATUSES.PAUSED)}>Pause</button>
-          )}
-          {status === PLAYER_STATUSES.PLAYING || status === PLAYER_STATUSES.PAUSED ? (
-            <button onClick={() => setStatus(PLAYER_STATUSES.STOPPED)}>Stop</button>
-          ) : null}
-        </div>
+        <CurrentlyPlaying />
 
         <Audio />
 
@@ -91,7 +81,7 @@ const App = () => {
           :global(body) {
             background: #282831;
             color: white;
-            margin: 0;
+            margin: 0 0 100px;
             font-family: -apple-system, BlinkMacSystemFont, Avenir Next, Avenir, Helvetica,
               sans-serif;
           }
