@@ -17,28 +17,26 @@ const Audio = () => {
     changeTrack
   } = useContext(PlayerContext);
 
-  //////////////////
   // debugging
-  useEffect(() => {
-    console.log('status change!', status);
-  }, [status]);
+  // useEffect(() => {
+  //   console.log('status change!', status);
+  // }, [status]);
 
-  useEffect(() => {
-    console.log('trackUrl change!', trackUrl);
-  }, [trackUrl]);
+  // useEffect(() => {
+  //   console.log('trackUrl change!', trackUrl);
+  // }, [trackUrl]);
 
-  useEffect(() => {
-    console.log('elapsed change!', elapsed);
-  }, [elapsed]);
+  // useEffect(() => {
+  //   console.log('elapsed change!', elapsed);
+  // }, [elapsed]);
 
-  useEffect(() => {
-    console.log('duration change!', duration);
-  }, [duration]);
+  // useEffect(() => {
+  //   console.log('duration change!', duration);
+  // }, [duration]);
 
-  useEffect(() => {
-    console.log('seekingTo change!', seekingTo);
-  }, [seekingTo]);
-  //////////////////
+  // useEffect(() => {
+  //   console.log('seekingTo change!', seekingTo);
+  // }, [seekingTo]);
 
   useEffect(() => {
     if (status === PLAYER_STATUSES.PAUSED) {

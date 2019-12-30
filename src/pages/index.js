@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import Head from 'next/head';
 import Audio from '../components/audio';
-import Nav from '../components/nav';
+import Nav, { NAV_HEIGHT } from '../components/nav';
 import Waveform from '../components/waveform';
-import CurrentlyPlaying from '../components/currentlyPlaying';
+import CurrentlyPlaying, { CURRENTLY_PLAYING_HEIGHT } from '../components/currentlyPlaying';
 import { PLAYER_STATUSES, TRACKS } from '../constants';
 import PlayerContext from '../playerContext';
 
@@ -63,10 +63,10 @@ const App = () => {
         </header>
 
         <section>
-          {TRACKS.map(({ title, url }, i) => (
+          {TRACKS.map(({ artist, title, url }, i) => (
             <div className="track-wrapper" key={`track-wrapper-${i}`}>
               <h3 className="track-title" onClick={() => changeTrack(url)}>
-                {title}
+                {artist} - {title}
               </h3>
               <Waveform waveformTrackUrl={url} />
             </div>
@@ -81,7 +81,7 @@ const App = () => {
           :global(body) {
             background: #282831;
             color: white;
-            margin: 0 0 100px;
+            margin: ${NAV_HEIGHT + 16}px 0 ${CURRENTLY_PLAYING_HEIGHT + 16}px;
             font-family: -apple-system, BlinkMacSystemFont, Avenir Next, Avenir, Helvetica,
               sans-serif;
           }

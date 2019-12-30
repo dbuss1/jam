@@ -4,6 +4,8 @@ import PlayerContext from '../playerContext';
 import { timeString } from '../formatters';
 import { PLAYER_STATUSES, TRACKS } from '../constants';
 
+export const CURRENTLY_PLAYING_HEIGHT = 50;
+
 const CurrentlyPlaying = () => {
   const { status, setStatus, trackUrl, elapsed, duration } = useContext(PlayerContext);
 
@@ -19,9 +21,9 @@ const CurrentlyPlaying = () => {
           >
             <Icon type={isPlaying ? 'pause' : 'play'} />
           </button>
-          <button onClick={() => setStatus(PLAYER_STATUSES.STOPPED)}>
+          {/* <button onClick={() => setStatus(PLAYER_STATUSES.STOPPED)}>
             <Icon type="stop" />
-          </button>
+          </button> */}
         </div>
         <div>
           <span>
@@ -37,12 +39,12 @@ const CurrentlyPlaying = () => {
         .currently-playing {
           position: fixed;
           bottom: 0;
-          height: 50px;
+          height: ${CURRENTLY_PLAYING_HEIGHT}px;
           width: 100%;
           background: #141414;
         }
         .content {
-          height: 50px;
+          height: ${CURRENTLY_PLAYING_HEIGHT}px;
           max-width: 1200px;
           margin: 0 auto;
           display: flex;

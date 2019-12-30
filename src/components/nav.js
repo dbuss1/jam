@@ -7,6 +7,8 @@ const links = [
   return link
 });
 
+export const NAV_HEIGHT = 70;
+
 const Nav = () => (
   <nav>
     <ul>
@@ -19,9 +21,10 @@ const Nav = () => (
 
     <style jsx>{`
       nav {
-        position: sticky;
-        position: -webkit-sticky;
+        position: fixed;
         top: 0;
+        width: 100%;
+        height: ${NAV_HEIGHT}px;
         background: white;
         border-bottom: 1px solid #ddd;
       }
