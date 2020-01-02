@@ -1,10 +1,8 @@
 import React from 'react';
 
-const links = [
-  { href: '/', label: 'Home' },
-].map(link => {
-  link.key = `nav-link-${link.href}-${link.label}`
-  return link
+const links = [{ href: '/', label: 'Home' }].map(link => {
+  link.key = `nav-link-${link.href}-${link.label}`;
+  return link;
 });
 
 export const NAV_HEIGHT = 70;
@@ -33,7 +31,8 @@ const Nav = () => (
         margin: 0;
         padding: 0;
       }
-      ul, li {
+      ul,
+      li {
         list-style-type: none;
       }
       li {

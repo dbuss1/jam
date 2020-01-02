@@ -8,7 +8,6 @@ const Audio = () => {
   const {
     trackUrl,
     status,
-    elapsed,
     setElapsed,
     duration,
     setDuration,
@@ -25,10 +24,6 @@ const Audio = () => {
   // useEffect(() => {
   //   console.log('trackUrl change!', trackUrl);
   // }, [trackUrl]);
-
-  // useEffect(() => {
-  //   console.log('elapsed change!', elapsed);
-  // }, [elapsed]);
 
   // useEffect(() => {
   //   console.log('duration change!', duration);
@@ -64,9 +59,7 @@ const Audio = () => {
   };
 
   const handleTimeUpdate = ({ target }) => {
-    if (elapsed !== target.elapsed) {
-      setElapsed(target.currentTime);
-    }
+    setElapsed(target.currentTime);
   };
 
   return (

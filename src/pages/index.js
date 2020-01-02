@@ -33,6 +33,8 @@ const App = () => {
     }
   };
 
+  const memoizedNav = React.useMemo(() => <Nav />, []);
+
   return (
     <PlayerContext.Provider
       value={{
@@ -56,7 +58,7 @@ const App = () => {
           {/* <link rel="icon" href="/favicon.ico" /> */}
         </Head>
 
-        <Nav />
+        {memoizedNav}
 
         <header>
           <h1>🌶️ 🐅</h1>
