@@ -35,6 +35,8 @@ const App = () => {
 
   const memoizedNav = React.useMemo(() => <Nav />, []);
 
+  // console.log('render', status, trackUrl, elapsed, duration, seekingTo);
+
   return (
     <PlayerContext.Provider
       value={{

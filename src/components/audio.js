@@ -8,6 +8,7 @@ const Audio = () => {
   const {
     trackUrl,
     status,
+    setStatus,
     setElapsed,
     duration,
     setDuration,
@@ -15,23 +16,6 @@ const Audio = () => {
     setSeekingTo,
     changeTrack
   } = useContext(PlayerContext);
-
-  // debugging
-  // useEffect(() => {
-  //   console.log('status change!', status);
-  // }, [status]);
-
-  // useEffect(() => {
-  //   console.log('trackUrl change!', trackUrl);
-  // }, [trackUrl]);
-
-  // useEffect(() => {
-  //   console.log('duration change!', duration);
-  // }, [duration]);
-
-  // useEffect(() => {
-  //   console.log('seekingTo change!', seekingTo);
-  // }, [seekingTo]);
 
   useEffect(() => {
     if (status === PLAYER_STATUSES.PAUSED) {
@@ -62,12 +46,17 @@ const Audio = () => {
     setElapsed(target.currentTime);
   };
 
+  const handleEnded = () => {
+    setStatus(PLAYER_STATUSES.PAUSED);
+  };
+
   return (
     <audio
       ref={audioRef}
       src={trackUrl}
       onLoadedMetadata={handleLoadedMetadata}
       onTimeUpdate={handleTimeUpdate}
+      onEnded={handleEnded}
     />
   );
 };

@@ -1,10 +1,50 @@
-import React, { useContext } from 'react';
+import React, { useContext, useRef } from 'react';
 import Icon from './icon';
 import PlayerContext from '../playerContext';
 import { timeString } from '../formatters';
 import { PLAYER_STATUSES, TRACKS } from '../constants';
 
 export const CURRENTLY_PLAYING_HEIGHT = 50;
+
+const ProgressBar = () => {
+  const progressBarRef = useRef(null);
+  const { elapsed, duration, setSeekingTo } = useContext(PlayerContext);
+
+  const handleClick = e => {
+    let clickedPercent = (e.clientX - progressBarRef.current.offsetLeft) / progressBarRef.current.offsetWidth;
+    clickedPercent = Math.max(0, clickedPercent);
+    clickedPercent = Math.min(1, clickedPercent);
+    setSeekingTo(clickedPercent * duration);
+  };
+
+  return (
+    <div className="progress-bar" ref={progressBarRef} onClick={handleClick}>
+      <div className="progress-bg" />
+      <div className="progress-fg" />
+      <style jsx>
+        {`
+          .progress-bar {
+            width: 470px;
+            margin: 0 12px;
+            padding: 8px 0;
+            cursor: pointer;
+          }
+          .progress-bg {
+            background-color: #ccc;
+            width: 100%;
+            height: 1px;
+          }
+          .progress-fg {
+            background-color: orange;
+            width: ${(elapsed / duration) * 100}%;
+            height: 1px;
+            margin-top: -1px;
+          }
+        `}
+      </style>
+    </div>
+  );
+};
 
 const CurrentlyPlaying = () => {
   const { status, setStatus, trackUrl, elapsed, duration } = useContext(PlayerContext);
@@ -25,10 +65,10 @@ const CurrentlyPlaying = () => {
             <Icon type="stop" />
           </button> */}
         </div>
-        <div>
-          <span>
-            {timeString(elapsed)} / {timeString(duration)}
-          </span>
+        <div className="progress-bar-wrapper">
+          <span>{timeString(elapsed || 0)}</span>
+          <ProgressBar />
+          <span>{timeString(duration || 0)}</span>
         </div>
         <div className="details">
           <span className="artist">{currentTrack.artist}</span>
@@ -63,14 +103,18 @@ const CurrentlyPlaying = () => {
           padding: 0;
           cursor: pointer;
         }
+        .progress-bar-wrapper {
+          display: flex;
+          align-items: center;
+        }
         .details {
           width: 360px;
           display: flex;
           flex-direction: column;
         }
         .details .artist {
-          opacity: 0.7;
-          font-size: 90%;
+          color: #ccc;
+          font-size: 80%;
         }
       `}</style>
     </div>
