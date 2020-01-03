@@ -5,13 +5,15 @@ import { timeString } from '../formatters';
 import { PLAYER_STATUSES, TRACKS } from '../constants';
 
 export const CURRENTLY_PLAYING_HEIGHT = 50;
+const BALL_SIZE = 10;
 
 const ProgressBar = () => {
   const progressBarRef = useRef(null);
   const { elapsed, duration, setSeekingTo } = useContext(PlayerContext);
 
   const handleClick = e => {
-    let clickedPercent = (e.clientX - progressBarRef.current.offsetLeft) / progressBarRef.current.offsetWidth;
+    let clickedPercent =
+      (e.clientX - progressBarRef.current.offsetLeft) / progressBarRef.current.offsetWidth;
     clickedPercent = Math.max(0, clickedPercent);
     clickedPercent = Math.min(1, clickedPercent);
     setSeekingTo(clickedPercent * duration);
@@ -21,12 +23,14 @@ const ProgressBar = () => {
     <div className="progress-bar" ref={progressBarRef} onClick={handleClick}>
       <div className="progress-bg" />
       <div className="progress-fg" />
+      <div className="ball" />
       <style jsx>
         {`
           .progress-bar {
             width: 470px;
             margin: 0 12px;
             padding: 8px 0;
+            position: relative;
             cursor: pointer;
           }
           .progress-bg {
@@ -39,6 +43,15 @@ const ProgressBar = () => {
             width: ${(elapsed / duration) * 100}%;
             height: 1px;
             margin-top: -1px;
+          }
+          .ball {
+            border-radius: 50%;
+            width: ${BALL_SIZE}px;
+            height: ${BALL_SIZE}px;
+            background: orange;
+            position: absolute;
+            left: calc(${(elapsed / duration) * 100}% - ${BALL_SIZE / 2}px);
+            top: ${BALL_SIZE / 2 - 1}px;
           }
         `}
       </style>
