@@ -27,7 +27,8 @@ const ProgressBar = () => {
       <style jsx>
         {`
           .progress-bar {
-            width: 470px;
+            width: 100%;
+            min-width: 100px;
             margin: 0 12px;
             padding: 8px 0;
             position: relative;
@@ -62,21 +63,27 @@ const ProgressBar = () => {
 const CurrentlyPlaying = () => {
   const { status, setStatus, trackUrl, elapsed, duration } = useContext(PlayerContext);
 
-  const currentTrack = TRACKS.filter(track => track.url === trackUrl)[0];
+  const currentTrack = TRACKS.filter(track => track.url === trackUrl)[0] || {
+    title: '',
+    artist: ''
+  };
   const isPlaying = status === PLAYER_STATUSES.PLAYING;
 
-  return currentTrack ? (
+  return (
     <div className="currently-playing">
       <div className="content">
         <div className="controls">
+          <button>
+            <Icon type="skipBackward" />
+          </button>
           <button
             onClick={() => setStatus(isPlaying ? PLAYER_STATUSES.PAUSED : PLAYER_STATUSES.PLAYING)}
           >
             <Icon type={isPlaying ? 'pause' : 'play'} />
           </button>
-          {/* <button onClick={() => setStatus(PLAYER_STATUSES.STOPPED)}>
-            <Icon type="stop" />
-          </button> */}
+          <button>
+            <Icon type="skipForward" />
+          </button>
         </div>
         <div className="progress-bar-wrapper">
           <span>{timeString(elapsed || 0)}</span>
@@ -98,32 +105,42 @@ const CurrentlyPlaying = () => {
         }
         .content {
           height: ${CURRENTLY_PLAYING_HEIGHT}px;
-          max-width: 1200px;
+          max-width: 1000px;
           margin: 0 auto;
           display: flex;
           align-items: center;
-          justify-content: space-between;
+          justify-content: center;
         }
         .controls {
           margin: 0 1rem;
-          width: 100px;
+          display: flex;
         }
         .controls button {
           border: none;
           outline: none;
           background: none;
-          margin: 0 4px;
+          margin: 0 8px;
           padding: 0;
           cursor: pointer;
         }
         .progress-bar-wrapper {
           display: flex;
           align-items: center;
+          width: 100%;
+        }
+        .progress-bar-wrapper span {
+          font-size: 12px;
         }
         .details {
+          margin: 0 1rem;
           width: 360px;
           display: flex;
           flex-direction: column;
+        }
+        .details span {
+          white-space: nowrap;
+          text-overflow: ellipsis;
+          overflow: hidden;
         }
         .details .artist {
           color: #ccc;
@@ -131,7 +148,7 @@ const CurrentlyPlaying = () => {
         }
       `}</style>
     </div>
-  ) : null;
+  );
 };
 
 export default CurrentlyPlaying;

@@ -8,28 +8,19 @@ import { PLAYER_STATUSES, TRACKS } from '../constants';
 import PlayerContext from '../playerContext';
 
 const App = () => {
-  const [status, setStatus] = useState(PLAYER_STATUSES.STOPPED);
+  const [status, setStatus] = useState();
   const [trackUrl, setTrackUrl] = useState();
   const [previousTrackUrl, setPreviousTrackUrl] = useState();
   const [elapsed, setElapsed] = useState(0);
   const [duration, setDuration] = useState();
   const [seekingTo, setSeekingTo] = useState();
 
-  const stopTrack = () => {
-    setTrackUrl();
-    setStatus(PLAYER_STATUSES.STOPPED);
-    setDuration();
-    setElapsed(0);
-  };
-
   const changeTrack = newTrackUrl => {
-    setPreviousTrackUrl(trackUrl);
-    if (newTrackUrl) {
+    if (newTrackUrl !== trackUrl) {
+      setPreviousTrackUrl(trackUrl);
       setElapsed(0);
       setTrackUrl(newTrackUrl);
       setStatus(PLAYER_STATUSES.PLAYING);
-    } else {
-      stopTrack();
     }
   };
 
@@ -70,7 +61,8 @@ const App = () => {
           {TRACKS.map(({ artist, title, url }, i) => (
             <div className="track-wrapper" key={`track-wrapper-${i}`}>
               <h3 className="track-title" onClick={() => changeTrack(url)}>
-                {artist} - {title}
+                <span className="artist">{artist}</span>
+                <span className="title">{title}</span>
               </h3>
               <Waveform waveformTrackUrl={url} />
             </div>
@@ -98,11 +90,15 @@ const App = () => {
             overflow: hidden;
           }
           .track-title {
-            display: inline-block;
+            display: inline-flex;
+            flex-direction: column;
             cursor: pointer;
             font-weight: normal;
-            text-align: left;
-            margin: 1rem;
+            margin: 1rem 1rem 0;
+          }
+          .track-title .artist {
+            font-size: 80%;
+            color: #ccc;
           }
         `}</style>
       </div>

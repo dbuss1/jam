@@ -2,11 +2,15 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import PlayIcon from '../img/play.svg';
 import PauseIcon from '../img/pause.svg';
+import SkipBackwardIcon from '../img/skip-backward.svg';
+import SkipForwardIcon from '../img/skip-forward.svg';
 import StopIcon from '../img/stop.svg';
 
 const iconTypeMap = {
   play: PlayIcon,
   pause: PauseIcon,
+  skipBackward: SkipBackwardIcon,
+  skipForward: SkipForwardIcon,
   stop: StopIcon
 };
 

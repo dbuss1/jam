@@ -13,16 +13,12 @@ const Audio = () => {
     duration,
     setDuration,
     seekingTo,
-    setSeekingTo,
-    changeTrack
+    setSeekingTo
   } = useContext(PlayerContext);
 
   useEffect(() => {
     if (status === PLAYER_STATUSES.PAUSED) {
       audioRef.current.pause();
-    } else if (status === PLAYER_STATUSES.STOPPED) {
-      audioRef.current.pause();
-      changeTrack();
     } else if (status === PLAYER_STATUSES.PLAYING) {
       audioRef.current.play();
     }

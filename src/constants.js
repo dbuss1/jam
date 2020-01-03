@@ -1,7 +1,6 @@
 export const PLAYER_STATUSES = {
   PLAYING: 'playing',
-  PAUSED: 'paused',
-  STOPPED: 'stopped'
+  PAUSED: 'paused'
 };
 
 export const TRACKS = [
