@@ -1,6 +1,10 @@
 import React from 'react';
+import Link from 'next/link';
 
-const links = [{ href: '/', label: 'Home' }].map(link => {
+const links = [
+  { href: '/', label: 'Home' },
+  { href: '/page2', label: 'Test page' }
+].map(link => {
   link.key = `nav-link-${link.href}-${link.label}`;
   return link;
 });
@@ -12,7 +16,9 @@ const Nav = () => (
     <ul>
       {links.map(({ key, href, label }) => (
         <li key={key}>
-          <a href={href}>{label}</a>
+          <Link href={href}>
+            <a>{label}</a>
+          </Link>
         </li>
       ))}
     </ul>
