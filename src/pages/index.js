@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import Waveform from '../components/waveform';
+import DropTrack from '../components/dropTrack';
 import { TRACKS } from '../constants';
 import PlayerContext from '../playerContext';
 
@@ -13,6 +14,7 @@ const App = () => {
       </header>
 
       <section>
+        <DropTrack />
         {TRACKS.map(({ artist, title, url }, i) => (
           <div className="track-wrapper" key={`track-wrapper-${i}`}>
             <h3 className="track-title" onClick={() => changeTrack(url)}>
