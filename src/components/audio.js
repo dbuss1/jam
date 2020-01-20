@@ -1,12 +1,11 @@
 import React, { useRef, useEffect, useContext } from 'react';
-import PropTypes from 'prop-types';
 import { PLAYER_STATUSES } from '../constants';
 import PlayerContext from '../playerContext';
 
 const Audio = () => {
   const audioRef = useRef({});
   const {
-    trackUrl,
+    curTrack,
     status,
     setStatus,
     setElapsed,
@@ -22,7 +21,7 @@ const Audio = () => {
     } else if (status === PLAYER_STATUSES.PLAYING) {
       audioRef.current.play();
     }
-  }, [audioRef, status, trackUrl]);
+  }, [audioRef, status, curTrack]);
 
   useEffect(() => {
     if (audioRef && Number.isFinite(seekingTo)) {
@@ -49,17 +48,12 @@ const Audio = () => {
   return (
     <audio
       ref={audioRef}
-      src={trackUrl}
+      src={curTrack.url}
       onLoadedMetadata={handleLoadedMetadata}
       onTimeUpdate={handleTimeUpdate}
       onEnded={handleEnded}
     />
   );
-};
-
-Audio.propTypes = {
-  trackUrl: PropTypes.string,
-  status: PropTypes.string
 };
 
 export default Audio;

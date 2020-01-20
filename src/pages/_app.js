@@ -1,25 +1,26 @@
 import React, { useState } from 'react';
-import PropTypes from 'prop-types';
 import Head from 'next/head';
 import PlayerContext from '../playerContext';
-import { PLAYER_STATUSES } from '../constants';
+import { PLAYER_STATUSES, INITIAL_TRACKS } from '../constants';
 import Audio from '../components/audio';
 import Nav, { NAV_HEIGHT } from '../components/nav';
 import CurrentlyPlaying, { CURRENTLY_PLAYING_HEIGHT } from '../components/currentlyPlaying';
 
-function MyApp({ Component, pageProps }) {
+// eslint-disable-next-line react/prop-types
+function App({ Component, pageProps }) {
+  const [tracks, setTracks] = useState(INITIAL_TRACKS);
   const [status, setStatus] = useState();
-  const [trackUrl, setTrackUrl] = useState();
-  const [previousTrackUrl, setPreviousTrackUrl] = useState();
+  const [curTrack, setCurTrack] = useState({});
+  const [previousTrackId, setPreviousTrackId] = useState();
   const [elapsed, setElapsed] = useState(0);
   const [duration, setDuration] = useState();
   const [seekingTo, setSeekingTo] = useState();
 
-  const changeTrack = newTrackUrl => {
-    if (newTrackUrl !== trackUrl) {
-      setPreviousTrackUrl(trackUrl);
+  const changeTrack = newTrack => {
+    if (newTrack.id !== curTrack.id) {
+      setPreviousTrackId(curTrack.id);
       setElapsed(0);
-      setTrackUrl(newTrackUrl);
+      setCurTrack(newTrack);
       setStatus(PLAYER_STATUSES.PLAYING);
     }
   };
@@ -27,11 +28,13 @@ function MyApp({ Component, pageProps }) {
   return (
     <PlayerContext.Provider
       value={{
+        tracks,
+        setTracks,
+        curTrack,
+        setCurTrack,
         status,
         setStatus,
-        trackUrl,
-        setTrackUrl,
-        previousTrackUrl,
+        previousTrackId,
         elapsed,
         setElapsed,
         duration,
@@ -61,9 +64,4 @@ function MyApp({ Component, pageProps }) {
   );
 }
 
-MyApp.propTypes = {
-  Component: PropTypes.function,
-  pageProps: PropTypes.object
-};
-
-export default MyApp;
+export default App;

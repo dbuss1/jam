@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
+import PlayerContext from '../playerContext';
+import { newTrackId } from '../helpers';
 
 const DropTrack = () => {
   const [isDragging, setIsDragging] = useState(false);
+  const { changeTrack, tracks, setTracks } = useContext(PlayerContext);
 
   const handleDragEnter = () => {
     setIsDragging(true);
@@ -28,16 +31,20 @@ const DropTrack = () => {
   };
 
   const readFile = file => {
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const reader = new FileReader();
-
-    reader.onload = async function(e) {
-      console.log('file read', e);
-      const audioBuffer = await audioContext.decodeAudioData(e.target.result);
-      console.log('audioBuffer', audioBuffer);
+    reader.onload = e => {
+      console.log(e);
+      // TODO: get metadata from file?
+      const newTrack = {
+        title: 'new song',
+        artist: '???',
+        url: reader.result,
+        id: newTrackId()
+      };
+      setTracks([newTrack, ...tracks]);
+      changeTrack(newTrack);
     };
-
-    reader.readAsArrayBuffer(file);
+    reader.readAsDataURL(file);
   };
 
   return (

@@ -2,7 +2,7 @@ import React, { useContext, useRef } from 'react';
 import Icon from './icon';
 import PlayerContext from '../playerContext';
 import { timeString } from '../formatters';
-import { PLAYER_STATUSES, TRACKS } from '../constants';
+import { PLAYER_STATUSES } from '../constants';
 
 export const CURRENTLY_PLAYING_HEIGHT = 50;
 const BALL_SIZE = 10;
@@ -61,12 +61,8 @@ const ProgressBar = () => {
 };
 
 const CurrentlyPlaying = () => {
-  const { status, setStatus, trackUrl, elapsed, duration } = useContext(PlayerContext);
+  const { tracks, status, setStatus, curTrack, elapsed, duration } = useContext(PlayerContext);
 
-  const currentTrack = TRACKS.filter(track => track.url === trackUrl)[0] || {
-    title: '',
-    artist: ''
-  };
   const isPlaying = status === PLAYER_STATUSES.PLAYING;
 
   return (
@@ -91,8 +87,8 @@ const CurrentlyPlaying = () => {
           <span>{timeString(duration || 0)}</span>
         </div>
         <div className="details">
-          <span className="artist">{currentTrack.artist}</span>
-          <span className="song">{currentTrack.title}</span>
+          <span className="artist">{curTrack.artist}</span>
+          <span className="song">{curTrack.title}</span>
         </div>
       </div>
       <style jsx>{`

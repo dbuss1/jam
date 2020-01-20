@@ -14,7 +14,7 @@ const DEFAULT_COLORS = {
 const DEFAULT_HEIGHT = 120;
 const MAX_NUM_LINES = 1000;
 
-const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_HEIGHT }) => {
+const Waveform = ({ track, colors = DEFAULT_COLORS, height = DEFAULT_HEIGHT }) => {
   const canvasRef = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRendered, setIsRendered] = useState(false);
@@ -22,8 +22,8 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
   const [filteredData, setFilteredData] = useState([]);
   const [canvasWidth, setCanvasWidth] = useState([]);
   const {
-    trackUrl: playerTrackUrl,
-    previousTrackUrl,
+    curTrack,
+    previousTrackId,
     setStatus,
     elapsed,
     duration,
@@ -31,13 +31,13 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
     changeTrack
   } = useContext(PlayerContext);
 
-  const isActive = playerTrackUrl === waveformTrackUrl;
+  const isActive = curTrack.id === track.id;
 
   // Fetch track and set audio data on state
   useEffect(() => {
     const getAudioDataFromTrack = async () => {
       const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-      const response = await fetch(waveformTrackUrl);
+      const response = await fetch(track.url);
       const arrayBuffer = await response.arrayBuffer();
       const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
       const rawData = audioBuffer.getChannelData(0);
@@ -78,7 +78,7 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
     if (canvasRef && filteredData.length > 0) {
       if (!isRendered) setIsRendered(true);
       draw({
-        isActive: playerTrackUrl === waveformTrackUrl,
+        isActive: curTrack.id === track.id,
         canvas: canvasRef.current,
         normalizedData: filteredData,
         percentPlayed: elapsed / duration,
@@ -100,10 +100,10 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
     }
   }, [elapsed]);
 
-  // When playerTrackUrl is changed, redraw the previously active Waveform to remove the `played`
+  // When curTrack is changed, redraw the previously active Waveform to remove the `played`
   // line colors.
   useEffect(() => {
-    if (previousTrackUrl === waveformTrackUrl) {
+    if (previousTrackId === track.id) {
       draw({
         isActive: false,
         canvas: canvasRef.current,
@@ -112,7 +112,7 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
         colors
       });
     }
-  }, [playerTrackUrl]);
+  }, [curTrack]);
 
   const handleWaveformClick = e => {
     if (isActive) {
@@ -124,7 +124,7 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
       setSeekingTo(clickedPercent * duration);
       setStatus(PLAYER_STATUSES.PLAYING);
     } else {
-      changeTrack(waveformTrackUrl);
+      changeTrack(track);
     }
   };
 
@@ -153,7 +153,7 @@ const Waveform = ({ waveformTrackUrl, colors = DEFAULT_COLORS, height = DEFAULT_
 };
 
 Waveform.propTypes = {
-  waveformTrackUrl: PropTypes.string.isRequired,
+  track: PropTypes.object.isRequired,
   colors: PropTypes.shape({
     unplayed: PropTypes.string,
     played: PropTypes.string
