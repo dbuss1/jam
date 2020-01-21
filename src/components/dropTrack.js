@@ -1,4 +1,6 @@
 import React, { useState, useContext } from 'react';
+import { get } from 'lodash';
+import * as mm from 'music-metadata-browser';
 import PlayerContext from '../playerContext';
 import { newTrackId } from '../helpers';
 
@@ -32,13 +34,17 @@ const DropTrack = () => {
 
   const readFile = file => {
     const reader = new FileReader();
-    reader.onload = e => {
-      console.log(e);
-      // TODO: get metadata from file?
+    reader.onload = async () => {
+      const url = reader.result;
+      const metadata = await mm.fetchFromUrl(url);
+      console.log('metadata', metadata);
       const newTrack = {
-        title: 'new song',
-        artist: '???',
-        url: reader.result,
+        title: get(metadata, 'common.title'),
+        artist: get(metadata, 'common.artist'),
+        album: get(metadata, 'common.album'),
+        year: get(metadata, 'common.year'),
+        art: get(metadata, 'common.picture.0'),
+        url,
         id: newTrackId()
       };
       setTracks([newTrack, ...tracks]);
@@ -61,7 +67,6 @@ const DropTrack = () => {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 300px;
           height: 100px;
           margin: 1rem;
           border: 2px dashed grey;

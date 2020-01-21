@@ -14,15 +14,26 @@ const Home = () => {
 
       <section>
         <DropTrack />
-        {tracks.map(track => (
-          <div className={`track-wrapper-${track.id}`} key={`track-wrapper-${track.id}`}>
-            <h3 className="track-title" onClick={() => changeTrack(track)}>
-              <span className="artist">{track.artist}</span>
-              <span className="title">{track.title}</span>
-            </h3>
-            <Waveform track={track} />
-          </div>
-        ))}
+        {tracks.map(track => {
+          let art = null;
+          if (track.art) {
+            const blob = new Blob([track.art.data], { type: track.art.format });
+            const imageUrl = window.URL.createObjectURL(blob);
+            art = <img className="art" src={imageUrl} />;
+          }
+          return (
+            <div className="track-wrapper" key={`track-wrapper-${track.id}`}>
+              <div className="track" onClick={() => changeTrack(track)}>
+                {art}
+                <div className="artist-title">
+                  <h3 className="artist">{track.artist}</h3>
+                  <h3 className="title">{track.title}</h3>
+                </div>
+              </div>
+              <Waveform track={track} />
+            </div>
+          );
+        })}
       </section>
 
       <style jsx>{`
@@ -34,15 +45,27 @@ const Home = () => {
           margin-bottom: 32px;
           overflow: hidden;
         }
-        .track-title {
+        .track {
           display: inline-flex;
-          flex-direction: column;
           cursor: pointer;
-          font-weight: normal;
           margin: 1rem 1rem 0;
         }
-        .track-title .artist {
-          font-size: 80%;
+        .track .art {
+          height: 80px;
+          width: 80px;
+          margin-right: 1rem;
+        }
+        .track h3 {
+          margin: 0;
+          font-weight: normal;
+        }
+        .track .artist-title {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+        }
+        .track .artist {
+          font-size: 90%;
           color: #ccc;
         }
       `}</style>
