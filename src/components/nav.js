@@ -29,8 +29,8 @@ const Nav = () => (
         top: 0;
         width: 100%;
         height: ${NAV_HEIGHT}px;
-        background: white;
-        border-bottom: 1px solid #ddd;
+        background: #141414;
+        border-bottom: 1px solid #000;
       }
       nav > ul {
         display: flex;
@@ -45,7 +45,7 @@ const Nav = () => (
         padding: 24px 16px;
       }
       a {
-        color: #067df7;
+        color: #fff;
         text-decoration: none;
         font-size: 13px;
       }

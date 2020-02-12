@@ -61,7 +61,7 @@ const ProgressBar = () => {
 };
 
 const CurrentlyPlaying = () => {
-  const { tracks, status, setStatus, curTrack, elapsed, duration } = useContext(PlayerContext);
+  const { status, setStatus, curTrack, elapsed, duration } = useContext(PlayerContext);
 
   const isPlaying = status === PLAYER_STATUSES.PLAYING;
 
@@ -98,6 +98,7 @@ const CurrentlyPlaying = () => {
           height: ${CURRENTLY_PLAYING_HEIGHT}px;
           width: 100%;
           background: #141414;
+          border-top: 1px solid #000;
         }
         .content {
           height: ${CURRENTLY_PLAYING_HEIGHT}px;

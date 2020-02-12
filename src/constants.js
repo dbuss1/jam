@@ -7,15 +7,21 @@ export const PLAYER_STATUSES = {
 
 export const INITIAL_TRACKS = [
   {
-    title: 'Smooth',
+    title: 'Primavera',
     artist: 'Dylonious',
-    url: '/track1.mp3',
+    url: '/Primavera.mp3',
     id: newTrackId()
   },
   {
-    title: 'A Journey With Good Intentions',
+    title: "Cruis'n the Metaverse",
     artist: 'Dylonious',
-    url: '/track2.mp3',
+    url: "/Cruisn.mp3",
+    id: newTrackId()
+  },
+  {
+    title: 'Takeoff',
+    artist: 'Dylonious',
+    url: '/Takeoff.mp3',
     id: newTrackId()
   }
 ];

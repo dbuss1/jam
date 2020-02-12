@@ -9,7 +9,7 @@ const Home = () => {
   return (
     <div>
       <header>
-        <h1>🌶️ 🐅</h1>
+        <h1>happy little sound clouds</h1>
       </header>
 
       <section>
