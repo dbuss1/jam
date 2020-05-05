@@ -61,7 +61,7 @@ const DropTrack = () => {
       onDragEnter={handleDragEnter}
       onDragLeave={handleDragLeave}
     >
-      Drag an audio file here
+      Drag your own audio file here
       <style jsx>{`
         .drop-track {
           display: flex;
