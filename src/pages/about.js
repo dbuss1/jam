@@ -4,7 +4,7 @@ const AboutPage = () => (
     <div>
         <h1>about</h1>
         <p>Music and website created by Dylan Bussone.</p>
-        <img width="350" src="/muffin.jpg" />
+        <img width="350" src={`${process.env.ASSET_PREFIX}/muffin.jpg`} />
         <ul>
             {[
                 { href: 'https://www.youtube.com/user/dbuss1music', text: 'YouTube' },
