@@ -18,9 +18,5 @@ module.exports = {
 
     return config;
   },
-  exportPathMap: () => ({
-    '/': { page: '/' },
-    '/about': { page: '/about' }
-  }),
   assetPrefix,
 };
