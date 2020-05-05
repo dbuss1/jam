@@ -2,8 +2,8 @@ import React from 'react';
 import Link from 'next/link';
 
 const links = [
-  { href: '/', label: 'Home' },
-  { href: '/about', label: 'About' }
+  { href: '/', label: 'music' },
+  { href: '/about', label: 'about' }
 ].map(link => {
   link.key = `nav-link-${link.href}-${link.label}`;
   return link;
@@ -16,7 +16,7 @@ const Nav = () => (
     <ul>
       {links.map(({ key, href, label }) => (
         <li key={key}>
-          <Link href={href}>
+          <Link href={href} as={`${process.env.ASSET_PREFIX}${href}`}>
             <a>{label}</a>
           </Link>
         </li>

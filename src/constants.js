@@ -9,19 +9,19 @@ export const INITIAL_TRACKS = [
   {
     title: 'Primavera',
     artist: 'Dylonious',
-    url: '/Primavera.mp3',
+    url: `${process.env.ASSET_PREFIX}/Primavera.mp3`,
     id: newTrackId()
   },
   {
     title: "Cruis'n the Metaverse",
     artist: 'Dylonious',
-    url: "/Cruisn.mp3",
+    url: `${process.env.ASSET_PREFIX}/Cruisn.mp3`,
     id: newTrackId()
   },
   {
     title: 'Takeoff',
     artist: 'Dylonious',
-    url: '/Takeoff.mp3',
+    url: `${process.env.ASSET_PREFIX}/Takeoff.mp3`,
     id: newTrackId()
   }
 ];
