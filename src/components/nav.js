@@ -27,6 +27,7 @@ const Nav = () => (
       nav {
         position: fixed;
         top: 0;
+        z-index: 1;
         width: 100%;
         height: ${NAV_HEIGHT}px;
         background: #141414;

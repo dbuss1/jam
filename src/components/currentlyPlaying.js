@@ -69,17 +69,17 @@ const CurrentlyPlaying = () => {
     <div className="currently-playing">
       <div className="content">
         <div className="controls">
-          <button>
+          {/* <button>
             <Icon type="skipBackward" />
-          </button>
+          </button> */}
           <button
             onClick={() => setStatus(isPlaying ? PLAYER_STATUSES.PAUSED : PLAYER_STATUSES.PLAYING)}
           >
             <Icon type={isPlaying ? 'pause' : 'play'} />
           </button>
-          <button>
+          {/* <button>
             <Icon type="skipForward" />
-          </button>
+          </button> */}
         </div>
         <div className="progress-bar-wrapper">
           <span>{timeString(elapsed || 0)}</span>
